@@ -11,7 +11,7 @@
     
     <style>
         :root {
-            --primary-grad: linear-gradient(135deg, #f59e0b 0%, #facc15 100%);
+            --primary-grad: linear-gradient(135deg, #f50b0b 0%, #facc15 100%);
             --bg-grad: linear-gradient(135deg, #fffbeb 0%, #fefce8 100%);
             --orange: #f59e0b;
             --yellow: #facc15;
@@ -41,20 +41,44 @@
             border-bottom: 1px solid rgba(255,255,255,0.3);
         }
         
-        .nav-links { display: flex; gap: 32px; list-style: none; transition: var(--transition); }
+        .nav-links { display: flex; gap: 32px; list-style: none; transition: var(--transition); align-items: center; }
         .nav-links a { color: var(--slate); font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: var(--transition); }
         .nav-links a:hover { color: var(--orange); }
+
+        /* --- New Grade Dropdown CSS --- */
+        .dropdown { position: relative; }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            min-width: 150px;
+            box-shadow: var(--shadow-md);
+            border-radius: 12px;
+            padding: 10px 0;
+            z-index: 1001;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .dropdown:hover .dropdown-content { display: block; }
+        .dropdown-content a {
+            display: block;
+            padding: 10px 20px;
+            color: var(--slate) !important;
+            font-size: 0.85rem;
+        }
+        .dropdown-content a:hover { background: #fffbeb; color: var(--orange) !important; }
 
         .menu-toggle { display: none; font-size: 1.5rem; color: var(--dark); cursor: pointer; z-index: 1001; }
 
         .logo-container { display: flex; align-items: center; cursor: pointer; }
         
-        /* New CSS for Header Logo Image */
         .header-logo-img {
             width: 45px;
             height: 45px;
             object-fit: contain;
-            border-radius: 8px; /* Optional: adds slight rounding to the logo */
+            border-radius: 8px;
         }
 
         .brand-pill { font-size: 1.6rem; font-weight: 800; color: var(--dark); letter-spacing: -1px; margin-left: 10px; }
@@ -77,7 +101,6 @@
         }
         img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* --- Buttons & Cards --- */
         .classes-section { padding: 80px 10%; }
         .section-header { display: flex; flex-direction: column; align-items: center; gap: 20px; margin-bottom: 50px; }
         
@@ -100,7 +123,6 @@
         }
         .card:hover .enroll-btn { background: var(--primary-grad); color: white; border-color: transparent; }
 
-        /* --- Page Views --- */
         #results-page, #all-classes-page { display: none; padding: 100px 10%; min-height: 80vh; }
         .results-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 25px; margin-top: 40px; justify-items: center; }
         .res-img-wrap { width: 100%; max-width: 280px; aspect-ratio: 4/3; border-radius: 18px; overflow: hidden; box-shadow: var(--shadow-md); cursor: pointer; transition: var(--transition); border: 4px solid white; }
@@ -144,8 +166,10 @@
                 flex-direction: column; padding: 0; gap: 0; overflow: hidden;
                 max-height: 0; opacity: 0; box-shadow: var(--shadow-md);
             }
-            .nav-links.active { max-height: 400px; opacity: 1; padding: 20px 0; }
+            .nav-links.active { max-height: 600px; opacity: 1; padding: 20px 0; }
             .nav-links li { width: 100%; text-align: center; padding: 15px 0; }
+            .dropdown-content { position: static; box-shadow: none; display: none; }
+            .dropdown:hover .dropdown-content { display: block; }
             .hero { flex-direction: column; text-align: center; padding: 40px 5%; }
             .hero-images { margin-top: 30px; }
             nav.navbar { padding: 15px 5%; }
@@ -180,6 +204,11 @@
         </div>
         <ul class="nav-links" id="navLinks">
             <li><a onclick="showPage('home')">Home</a></li>
+            <li class="dropdown">
+                <a>Grades <i class="fas fa-chevron-down"></i></a>
+                <div class="dropdown-content" id="grade-dropdown">
+                    </div>
+            </li>
             <li><a onclick="showPage('all-classes')">All Classes</a></li>
             <li><a onclick="showPage('results')">Results</a></li>
             <li><a href="#footer" onclick="closeMenu()">Contact</a></li>
@@ -207,63 +236,15 @@
                 <h2 style="font-size: 2.2rem; font-weight: 800; text-align: center;">සම්බන්ද විය හැකි පන්ති</h2>
                 <button class="all-classes-btn" onclick="showPage('all-classes')">View All Classes <i class="fas fa-arrow-right"></i></button>
             </div>
-            <div class="grid">
-                <div class="card">
-                    <div style="height:220px"><img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&w=500"></div>
-                    <div class="card-body">
-                        <h3>Grade 10 Batch</h3>
-                        <p style="color:var(--slate); font-size:0.9rem; margin-top: 10px;">Full syllabus with weekly tracking.</p>
-                        <button class="enroll-btn" onclick="openPopup('Grade 10', 'LKR 3,000', 'Sunday 8:00 AM', 'Mr. Saman Kumara')">View Course Details</button>
-                    </div>
+            <div class="grid" id="featured-classes">
                 </div>
-                <div class="card">
-                    <div style="height:220px"><img src="https://images.unsplash.com/photo-1501504905252-473c47e087f8?auto=format&fit=crop&w=500"></div>
-                    <div class="card-body">
-                        <h3>Grade 11 Batch</h3>
-                        <p style="color:var(--slate); font-size:0.9rem; margin-top: 10px;">Intensive paper discussions and syllabus completion.</p>
-                        <button class="enroll-btn" onclick="openPopup('Grade 11', 'LKR 3,000', 'Monday 4:00 PM', 'Mr. Saman Kumara')">View Course Details</button>
-                    </div>
-                </div>
-                <div class="card">
-                    <div style="height:220px"><img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=500"></div>
-                    <div class="card-body">
-                        <h3>A/L Combined Maths</h3>
-                        <p style="color:var(--slate); font-size:0.9rem; margin-top: 10px;">Advanced level math for engineering & science streams.</p>
-                        <button class="enroll-btn" onclick="openPopup('A/L Combined Maths', 'LKR 4,500', 'Sat/Sun 1:00 PM', 'Mr. Silva')">View Course Details</button>
-                    </div>
-                </div>
-            </div>
         </section>
     </div>
 
     <div id="all-classes-page">
-        <h2 style="font-size: 2.5rem; font-weight: 800; text-align: center; margin-bottom: 50px;">All Available <span style="color: var(--orange)">Classes</span></h2>
+        <h2 id="all-classes-title" style="font-size: 2.5rem; font-weight: 800; text-align: center; margin-bottom: 50px;">All Available <span style="color: var(--orange)">Classes</span></h2>
         <div class="grid" id="all-classes-grid">
-            <script>
-                const classes = [
-                    {t: 'Grade 06', p: '2,000', d: 'Tuesday 3:00 PM', i: 'Mrs. Dilini'},
-                    {t: 'Grade 07', p: '2,200', d: 'Thursday 4:00 PM', i: 'Mr. Saman'},
-                    {t: 'Grade 08', p: '2,200', d: 'Friday 3:30 PM', i: 'Mr. Saman'},
-                    {t: 'Grade 09', p: '2,500', d: 'Saturday 8:00 AM', i: 'Mr. Perera'},
-                    {t: 'Grade 10', p: '3,000', d: 'Sunday 8:00 AM', i: 'Mr. Kumara'},
-                    {t: 'Grade 11', p: '3,000', d: 'Monday 4:00 PM', i: 'Mr. Kumara'},
-                    {t: 'A/L Combined Maths', p: '4,500', d: 'Sat/Sun 1:00 PM', i: 'Mr. Silva'},
-                    {t: 'A/L Physics', p: '4,500', d: 'Wednesday 3:00 PM', i: 'Mr. Bandara'},
-                    {t: 'A/L ICT', p: '4,000', d: 'Friday 5:00 PM', i: 'Mr. Jay'}
-                ];
-                
-                document.write(classes.map(c => `
-                    <div class="card">
-                        <div style="height:200px"><img src="https://images.unsplash.com/photo-1501504905252-473c47e087f8?auto=format&fit=crop&w=500"></div>
-                        <div class="card-body">
-                            <h3>${c.t} Batch</h3>
-                            <p style="color:var(--slate); font-size:0.9rem; margin-top: 10px;">Comprehensive syllabus coverage.</p>
-                            <button class="enroll-btn" onclick="openPopup('${c.t}', 'LKR ${c.p}', '${c.d}', '${c.i}')">View Course Details</button>
-                        </div>
-                    </div>
-                `).join(''));
-            </script>
-        </div>
+            </div>
     </div>
 
     <div id="results-page">
@@ -281,12 +262,56 @@
         <p>Hotline: +94 773 298 884</p>
     </footer>
 
-<a href="https://wa.me/94773298884" class="whatsapp-float">
+    <a href="https://wa.me/94773298884" class="whatsapp-float">
         <i class="fab fa-whatsapp" style="font-size: 1.6rem;"></i>
         <span>Whatsapp!</span>
     </a>
 
     <script>
+        const classes = [
+            {t: 'Grade 06', p: '2,000', d: 'Tuesday 3:00 PM', i: 'Mrs. Dilini', img: 'https://images.unsplash.com/photo-1501504905252-473c47e087f8?auto=format&fit=crop&w=500'},
+            {t: 'Grade 07', p: '2,200', d: 'Thursday 4:00 PM', i: 'Mr. Saman', img: 'https://images.unsplash.com/photo-1501504905252-473c47e087f8?auto=format&fit=crop&w=500'},
+            {t: 'Grade 08', p: '2,200', d: 'Friday 3:30 PM', i: 'Mr. Saman', img: 'https://images.unsplash.com/photo-1501504905252-473c47e087f8?auto=format&fit=crop&w=500'},
+            {t: 'Grade 09', p: '2,500', d: 'Saturday 8:00 AM', i: 'Mr. Perera', img: 'https://images.unsplash.com/photo-1501504905252-473c47e087f8?auto=format&fit=crop&w=500'},
+            {t: 'Grade 10', p: '3,000', d: 'Sunday 8:00 AM', i: 'Mr. Kumara', img: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&w=500'},
+            {t: 'Grade 11', p: '3,000', d: 'Monday 4:00 PM', i: 'Mr. Kumara', img: 'https://images.unsplash.com/photo-1501504905252-473c47e087f8?auto=format&fit=crop&w=500'},
+            {t: 'A/L Combined Maths', p: '4,500', d: 'Sat/Sun 1:00 PM', i: 'Mr. Silva', img: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=500'},
+            {t: 'A/L Physics', p: '4,500', d: 'Wednesday 3:00 PM', i: 'Mr. Bandara', img: 'https://images.unsplash.com/photo-1501504905252-473c47e087f8?auto=format&fit=crop&w=500'},
+            {t: 'A/L ICT', p: '4,000', d: 'Friday 5:00 PM', i: 'Mr. Jay', img: 'https://images.unsplash.com/photo-1501504905252-473c47e087f8?auto=format&fit=crop&w=500'}
+        ];
+
+        // Init Grade Dropdown
+        const dropdown = document.getElementById('grade-dropdown');
+        for (let i = 1; i <= 11; i++) {
+            const gradeText = i < 10 ? `Grade 0${i}` : `Grade ${i}`;
+            dropdown.innerHTML += `<a onclick="showGradeClasses('${gradeText}')">Grade ${i}</a>`;
+        }
+
+        function renderClasses(targetId, dataList) {
+            const container = document.getElementById(targetId);
+            container.innerHTML = dataList.map(c => `
+                <div class="card">
+                    <div style="height:220px"><img src="${c.img}"></div>
+                    <div class="card-body">
+                        <h3>${c.t} Batch</h3>
+                        <p style="color:var(--slate); font-size:0.9rem; margin-top: 10px;">Comprehensive syllabus coverage.</p>
+                        <button class="enroll-btn" onclick="openPopup('${c.t}', 'LKR ${c.p}', '${c.d}', '${c.i}')">View Course Details</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showGradeClasses(grade) {
+            const filtered = classes.filter(c => c.t === grade);
+            showPage('all-classes');
+            document.getElementById('all-classes-title').innerHTML = `Classes for <span style="color: var(--orange)">${grade}</span>`;
+            if(filtered.length > 0) {
+                renderClasses('all-classes-grid', filtered);
+            } else {
+                document.getElementById('all-classes-grid').innerHTML = `<p style="text-align:center; grid-column: 1/-1; padding: 50px; font-weight: 700;">No classes currently listed for ${grade}.</p>`;
+            }
+        }
+
         function toggleMenu() {
             document.getElementById('navLinks').classList.toggle('active');
         }
@@ -297,9 +322,16 @@
             const pages = ['home-page', 'results-page', 'all-classes-page'];
             pages.forEach(p => document.getElementById(p).style.display = 'none');
             document.getElementById(page + '-page').style.display = 'block';
+            
+            if(page === 'all-classes') {
+                document.getElementById('all-classes-title').innerHTML = `All Available <span style="color: var(--orange)">Classes</span>`;
+                renderClasses('all-classes-grid', classes);
+            }
+            
             closeMenu();
             window.scrollTo(0,0);
         }
+
         function openPopup(title, price, time, teacher) {
             document.getElementById('popTitle').innerText = title;
             document.getElementById('popPrice').innerText = price;
@@ -323,7 +355,9 @@
         function confirmEnrollment() {
             closePopup('courseModal');
         }
+
+        // Initial Load
+        renderClasses('featured-classes', classes.filter(c => c.t === 'Grade 10' || c.t === 'Grade 11' || c.t === 'A/L Combined Maths'));
     </script>
 </body>
 </html>
-
